@@ -63,6 +63,7 @@ Tarix DATETIME2,
 Mebleg DECIMAL
 )
 
+
 INSERT INTO Telimciler VALUES
 ('Emin','Imanverdiyev','Eli', '3fu5m34','0512638498','2002-11-11','IT','3 il',3),
 ('Xanim','Kerimli','Hezret', 'h5j3bd8','0512634498','1995-03-03','Komputer muhendisliyi','5 il',2),
@@ -102,7 +103,7 @@ INSERT INTO Telebeler VALUES
 
 select * from Telimciler
 select * from Telebeler
-select * from Paketler
+select * from Odenisler
 
 INSERT INTO Qeydiyyatlar VALUES
 (2,1,'2025-11-11',20,1,1),
@@ -149,24 +150,51 @@ GROUP BY P.Ad
 SELECT 
     YEAR(Tarix) AS Il,
     MONTH(Tarix) AS Ay,
-    SUM(Mebleg) AS Aylýq_Dövriyy?
+    SUM(Mebleg) AS Aylýq_Dovriyye
 FROM Odenisler
 GROUP BY YEAR(Tarix), MONTH(Tarix)
 ORDER BY Il, Ay
 
 
 ----3 Odenis vaxtina 3 gun qalan telebelerin siyahisi
+SELECT T.Ad,Q.MuqavileTarix, O.Tarix FROM Telebeler T
+INNER JOIN Qeydiyyatlar Q
+ON T.Id=Q.TelebeId
+INNER JOIN Odenisler O
+ON O.QeydiyyatId=Q.Id
+WHERE DATEDIFF(DAY, O.Tarix, GETDATE()) = 3
+
+
+
+
 ----4 Odenis vaxtindan kecen telebelerin siyahisi
+SELECT T.Ad,Q.MuqavileTarix, O.Tarix FROM Telebeler T
+INNER JOIN Qeydiyyatlar Q
+ON T.Id=Q.TelebeId
+INNER JOIN Odenisler O
+ON O.QeydiyyatId=Q.Id
+WHERE DATEDIFF(DAY, O.Tarix, GETDATE())>30
+
+
+
 ----5 Telimcilerin kursdan aldigi maas her telebenin ayliq odenisinin 50% olarsa maaslarini hesablayin
 SELECT 
-    tc.Ad AS Telimci,
-    SUM(o.Mebleg) * 0.5 AS Maas
-FROM Odenisler o
-INNER JOIN Qeydiyyatlar q ON q.Id = o.QeydiyyatId
-INNER JOIN Telimciler tc ON tc.Id = q.TelimciId
-GROUP BY tc.Ad
+    TL.Ad AS Telimci,
+    SUM(O.Mebleg) * 0.5 AS Maas
+FROM Odenisler O
+INNER JOIN Qeydiyyatlar Q ON Q.Id = O.QeydiyyatId
+INNER JOIN Telimciler TL ON TL.Id = Q.TelimciId
+GROUP BY TL.Ad
 
 ----6 Son 1 ayliq odenisi qalan telebelerin siyahisi
+SELECT T.Ad,Q.MuqavileTarix, O.Tarix FROM Telebeler T
+INNER JOIN Qeydiyyatlar Q
+ON T.Id=Q.TelebeId
+INNER JOIN Odenisler O
+ON O.QeydiyyatId=Q.Id
+WHERE DATEDIFF(DAY, O.Tarix, GETDATE()) BETWEEN 1 AND 30
+
+
 ----7 Hal hazirda kursun nece telebesi var
 SELECT COUNT(DISTINCT TelebeId) AS CariTelebeSayi
 FROM Qeydiyyatlar
@@ -182,5 +210,4 @@ ON Q.TelimciId=TL.Id
 GROUP BY P.Ad,TL.Ad 
 
 
-----9 Her paket uzre her bolmenin her movzusu uzre nece video derslik var
-----10 yalniz odenis odeyen telbelere video dersler ucun icaze verilsin
+
