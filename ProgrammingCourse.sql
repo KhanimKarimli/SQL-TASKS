@@ -208,6 +208,3 @@ ON Q.PaketId=P.Id
 INNER JOIN Telimciler TL
 ON Q.TelimciId=TL.Id
 GROUP BY P.Ad,TL.Ad 
-
-
-
